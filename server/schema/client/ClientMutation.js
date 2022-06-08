@@ -1,6 +1,7 @@
 // MONGOOSE MODELS
 const Client = require("../../models/Client");
 const ClientType = require("./ClientType");
+const Project = require("../../models/Project");
 
 const { GraphQLID, GraphQLString, GraphQLNonNull } = require("graphql");
 
@@ -52,6 +53,11 @@ const ClientMutation = {
     type: ClientType,
     args: { id: { type: new GraphQLNonNull(GraphQLID) } },
     resolve(parent, args) {
+      Project.find({ clientId: args.id })
+        .then((projects) => {
+          projects.forEach((project) => project.remove());
+        })
+        .catch((err) => console.log(err));
       return Client.findByIdAndRemove(args.id);
     },
   },
