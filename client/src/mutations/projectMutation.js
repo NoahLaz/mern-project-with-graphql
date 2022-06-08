@@ -12,11 +12,16 @@ const DELETE_PROJECT = gql`
 `;
 
 const ADD_PROJECT = gql`
-  mutation addProject($name: String!, $description: String!, $clientId: ID!) {
+  mutation addProject(
+    $name: String!
+    $description: String!
+    $status: ProjectStatus!
+    $clientId: ID!
+  ) {
     addProject(
       name: $name
       description: $description
-      status: new
+      status: $status
       clientId: $clientId
     ) {
       id
@@ -25,6 +30,7 @@ const ADD_PROJECT = gql`
       status
       client {
         id
+        name
       }
     }
   }
@@ -34,8 +40,8 @@ const UPDATE_PROJECT = gql`
   mutation updateProject(
     $id: ID!
     $name: String!
+    $status: ProjectStatusUpdate!
     $description: String!
-    $status: String!
   ) {
     updateProject(
       id: $id

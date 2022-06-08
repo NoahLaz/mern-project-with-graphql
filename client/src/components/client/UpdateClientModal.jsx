@@ -2,6 +2,7 @@ import { useMutation } from "@apollo/client";
 import { useState } from "react";
 import { ADD_CLIENT } from "../../mutations/clientMutation";
 import { GET_CLIENTS } from "../../queries/clientQueries";
+import { FaEdit } from "react-icons/fa";
 
 const UpdateClientModal = ({ oldClient }) => {
   const [client, setClient] = useState({ ...oldClient });
@@ -40,11 +41,11 @@ const UpdateClientModal = ({ oldClient }) => {
     <>
       <button
         type="button"
-        className="btn btn-sm btn-secondary d-flex align-items-center"
+        className="btn btn-sm btn-secondary d-flex justify-content-center align-items-center"
         data-bs-toggle="modal"
         data-bs-target="#addClientModal"
       >
-        <div>+</div>
+        <FaEdit />
       </button>
 
       <div

@@ -3,14 +3,18 @@ import { useState } from "react";
 import { FaBook } from "react-icons/fa";
 import { ADD_PROJECT } from "../../mutations/projectMutation";
 import { GET_PROJECTS } from "../../queries/projectQueries";
+import { useQuery } from "@apollo/client";
+import { GET_CLIENTS } from "../../queries/clientQueries";
 
 const AddProjectModal = () => {
   const [project, setProject] = useState({
     name: "",
     description: "",
-    status: "new",
+    status: "",
     clientId: "",
   });
+
+  const { loading, error, data } = useQuery(GET_CLIENTS);
 
   const [addProject] = useMutation(ADD_PROJECT, {
     variables: { ...project },
@@ -28,17 +32,17 @@ const AddProjectModal = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (
-      project.name ||
-      project.description ||
-      project.status ||
-      project.clientId
+      project.name === "" ||
+      project.description === "" ||
+      project.status === "" ||
+      project.clientId === ""
     ) {
-      addProject();
-    } else {
       alert("Please fill all fields");
+    } else {
+      addProject();
     }
 
-    // setProject({ name: "", description: "", status: "", clientId: "" });
+    // setProject({ name: "", description: "", clientId: "" });
   };
 
   const handleInput = (e) => {
@@ -47,108 +51,119 @@ const AddProjectModal = () => {
     });
   };
 
-  return (
-    <>
-      <button
-        type="button"
-        className="btn btn-secondary d-flex align-items-center"
-        data-bs-toggle="modal"
-        data-bs-target="#addProjectModal"
-      >
-        <FaBook className="icon" />
-        <div>Add Project</div>
-      </button>
+  if (loading) return <p>Loading...</p>;
 
-      <div
-        className="modal fade"
-        id="addProjectModal"
-        aria-labelledby="AddProjectModalLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title" id="AddProjectModalLabel">
-                Add Project
-              </h5>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div className="modal-body">
-              <form className="d-flex flex-column">
-                <div className="mb-3">
-                  <label htmlFor="form-name" className="form-label">
-                    Name
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="form-name"
-                    placeholder="Enter project name"
-                    onChange={handleInput}
-                    value={project.name}
-                    name="name"
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="form-description" className="form-label">
-                    Description
-                  </label>
-                  <input
-                    type="Email"
-                    className="form-control"
-                    id="form-description"
-                    placeholder="Enter project description"
-                    onChange={handleInput}
-                    value={project.description}
-                    name="description"
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="form-status" className="form-label">
-                    Status
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="form-status"
-                    placeholder="Enter the status"
-                    value={project.status}
-                    name="status"
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="form-clientId" className="form-label">
-                    Client id
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="form-clientId"
-                    placeholder="Enter client id"
-                    onChange={handleInput}
-                    value={project.clientId}
-                    name="clientId"
-                  />
-                </div>
+  if (!loading || !error) {
+    return (
+      <>
+        <button
+          type="button"
+          className="btn btn-secondary d-flex align-items-center"
+          data-bs-toggle="modal"
+          data-bs-target="#addProjectModal"
+        >
+          <FaBook className="icon" />
+          <div>Add Project</div>
+        </button>
+
+        <div
+          className="modal fade"
+          id="addProjectModal"
+          aria-labelledby="AddProjectModalLabel"
+          aria-hidden="true"
+        >
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title" id="AddProjectModalLabel">
+                  Add Project
+                </h5>
                 <button
-                  type="submit"
-                  className="btn btn-primary align-self-end px-3"
-                  onClick={handleSubmit}
-                >
-                  Submit
-                </button>
-              </form>
+                  type="button"
+                  className="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div className="modal-body">
+                <form onSubmit={handleSubmit} className="d-flex flex-column">
+                  <div className="mb-3">
+                    <label htmlFor="form-name" className="form-label">
+                      Name
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="form-name"
+                      placeholder="Enter project name"
+                      onChange={handleInput}
+                      value={project.name}
+                      name="name"
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label htmlFor="form-description" className="form-label">
+                      Description
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="form-description"
+                      placeholder="Enter project description"
+                      onChange={handleInput}
+                      value={project.description}
+                      name="description"
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">Status</label>
+                    <select
+                      id="status"
+                      className="form-select"
+                      value={project.status}
+                      onChange={handleInput}
+                      name="status"
+                    >
+                      <option value="">Select the progress</option>
+                      <option value="new">Not Started</option>
+                      <option value="progress">In Progress</option>
+                      <option value="complete">Complete</option>
+                    </select>
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">Client</label>
+                    <select
+                      id="clientId"
+                      className="form-select"
+                      value={project.clientId}
+                      onChange={handleInput}
+                      name="clientId"
+                    >
+                      <option value="" disabled>
+                        Select a client
+                      </option>
+                      {data.clients.map((client) => (
+                        <option key={client.id} value={client.id}>
+                          {client.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="btn btn-primary align-self-end px-3"
+                  >
+                    Submit
+                  </button>
+                </form>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </>
-  );
+      </>
+    );
+  }
 };
 
 export default AddProjectModal;
